@@ -1,0 +1,65 @@
+# Initial loading of helpful recommended packages
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+
+# Input data files are available in the read-only "../input/" directory
+# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory
+
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+
+## EXTRACT
+
+#Read in CSV file from kaggle
+import csv
+
+#Use Try Except function to catch file not found errors and produce descriptive output
+try:
+    with open('/kaggle/input/nutrition-facts/menu.csv') as csvDataFile:
+
+        # read file as csv file 
+        csvReader = csv.reader(csvDataFile)
+
+        # for every row, print the row
+        for row in csvReader:
+            print(row)
+except OSError as e:
+    print("File is not found!")
+ 
+ 
+## TRANSFORM
+
+#Again use Try Except function to catch file not found errors when creating dataframe
+try:
+    #Create dataframe out of CSV file using pandas
+    mcdonalds = pd.read_csv("/kaggle/input/nutrition-facts/menu.csv")
+except OSError as e:
+    print("File is not found!")
+
+#Filter to only include Breakfast items
+breakfast = mcdonalds[mcdonalds.Category == 'Breakfast']
+
+#Select columns that I am interested in further analyzing
+breakfast = breakfast[["Category", "Item", "Serving Size", "Calories", "Total Fat", "Carbohydrates", "Sugars", "Protein"]]
+
+#Filter to include only high protein items
+protein_breakfast = breakfast[breakfast.Protein >= 20]
+
+#Generate output
+protein_breakfast
+
+
+## LOAD
+
+#Convert the file from CSV to JSON
+import json
+#Use dataframe.to_json function, entering protein_breakfast dataframe as argument
+result = protein_breakfast.to_json(orient="split")
+#Parse the data
+parsed = json.loads(result)
+#JSON string representation of the python dictionary object is returned
+json.dumps(parsed, indent=4)
